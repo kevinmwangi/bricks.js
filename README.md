@@ -1,13 +1,12 @@
 # Bricks.js
 
-[![Bricks.js on NPM](https://img.shields.io/npm/v/bricks.js.svg?style=flat-square)](https://www.npmjs.com/package/bricks.js)
+[![Bricks.js on NPM](https://img.shields.io/npm/v/bricks.js.svg?style=flat-square)](https://www.npmjs.com/package/bricks.js) [![Bricks.js Downloads on NPM](https://img.shields.io/npm/dm/bricks.js.svg?style=flat-square)](https://www.npmjs.com/package/bricks.js) [![Standard JavaScript Style](https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 
 > Momma said, "Stay patient." - Bricks, DJ Carnage
 
 But you don't need to, because Bricks is **a blazing fast masonry layout generator for fixed width elements**.
 
 * [Demo Page](http://callmecavs.com/bricks.js/)
-* [Commercial Licenses](http://www.site.uplabs.com/posts/bricks-js-plugin)
 
 ## Getting Started
 
@@ -55,35 +54,51 @@ Parameters passed to the constructor are detailed below.
 
 ## Parameters
 
-Note that all parameters are **required**:
+Note that all parameters, _except `position`_, are **required**:
 
-* A [container](#container) selector
+* A [container](#container) (node or CSS selector)
 * A [packed](#packed) attribute
 * A [sizes](#sizes) array
+* A [position](#position) boolean (defaulting to `true`)
 
 ### container
 
-A CSS selector that matches the grid wrapper.
+A node, or CSS selector, that represents the grid wrapper. The _direct children_ of this element must be the grid items.
 
 ```es6
+// passing a node
+
+const instance = Bricks({
+  container: node
+})
+
+// passing a selector (document.querySelector is used to get the node)
+
 const instance = Bricks({
   container: '.selector'
 })
 ```
 
-Note that the direct children of this element must be the grid items.
-
 ### packed
 
-An attribute added to items already positioned within the grid.
+An attribute added to the grid items after they're positioned within the grid. If the attribute is not prefixed with `data-`, it will be added.
 
 ```es6
+// prefixed
+
 const instance = Bricks({
   packed: 'data-packed'
 })
+
+// unprefixed
+
+const instance = Bricks({
+  // becomes: 'data-packed'
+  packed: 'packed'
+})
 ```
 
-Note that if the attribute is not prefixed with `data-`, it will be added.
+Note that Bricks uses this attribute internally to avoiding unnecessarily repositioning grid items already in place. It's best to avoid manipulating it.
 
 ### sizes
 
@@ -97,7 +112,7 @@ When defining your sizes, note the following:
 * The size without the `mq` property is assumed to be your **smallest breakpoint, and must appear first**
 
 ```es6
-// mq      - the minimum viewport width (any unit)
+// mq      - the minimum viewport width (String CSS unit: em, px, rem)
 // columns - the number of vertical columns
 // gutter  - the space (in px) between the columns and grid items
 
@@ -111,6 +126,30 @@ const instance = Bricks({
   sizes: sizes
 })
 ```
+
+### position
+
+A boolean, defaulting to `true`, indicating that the grid items should be positioned using the `top` and `left` CSS properties.
+
+If set to `false`, the grid items will be positioned using the `transform` CSS property.
+
+```es6
+// default ('true')
+// grid items are positioned via the 'top' and 'left' properties
+
+const instance = Bricks({
+  position: true
+})
+
+// explicitly 'false' (not any falsy value!)
+// grid items are positioned via the 'transform' property
+
+const instance = Bricks({
+  position: false
+})
+```
+
+Positioning using `transform` is done via `translate3d` for optimal performance. Coupled with a CSS `transition`, this option allows for smoothly animating the grid items into place.
 
 ## API / Events
 
@@ -201,8 +240,6 @@ To support older browsers, consider including [polyfills/shims](https://github.c
 
 ## License
 
-[GPL-3.0](http://www.gnu.org/licenses/gpl.txt). © 2016 Michael Cavalea
-
-For use in open source projects that are compatible with this license, you may use this project under the terms of it. [Commercial licenses](http://www.site.uplabs.com/posts/bricks-js-plugin) are available for purchase.
+[MIT](https://opensource.org/licenses/MIT). © 2017 Michael Cavalea
 
 [![Built With Love](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
